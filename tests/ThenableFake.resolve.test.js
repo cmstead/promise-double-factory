@@ -4,10 +4,15 @@ const sinon = require('sinon');
 
 describe('ThenableFake', function () {
 
-    describe('resolve', function () {
-        it('calls a then action when called', function () {
-            const thenableFake = getThenableFake();
+    let thenableFake;
 
+    beforeEach(function () {
+        thenableFake = getThenableFake();
+    });
+    
+    describe('resolve', function () {
+
+        it('calls a then action when called', function () {
             const thenStub = sinon.stub();
 
             thenableFake
@@ -19,8 +24,6 @@ describe('ThenableFake', function () {
         });
 
         it('calls all then actions when called', function () {
-            const thenableFake = getThenableFake();
-
             const thenStub = sinon.stub();
 
             thenableFake
@@ -35,7 +38,6 @@ describe('ThenableFake', function () {
         });
 
         it('calls passes results from then to then', function () {
-            const thenableFake = getThenableFake();
             const thenStub = sinon.stub();
 
             thenableFake
@@ -50,7 +52,6 @@ describe('ThenableFake', function () {
         });
 
         it('calls catch actions when then action throws', function () {
-            const thenableFake = getThenableFake();
             const catchStub = sinon.stub();
             const errorMessage = 'An error occurred!';
 
@@ -64,9 +65,20 @@ describe('ThenableFake', function () {
             assert.equal(catchStub.callCount, 2);
         });
 
-        it('throws an error when called if no catch actions exist', function () {
-            const thenableFake = getThenableFake();
+        it('does not call any further then functions when error is thrown', function () {
+            const thenStub = sinon.stub();
+            const errorMessage = 'An error occurred!';
 
+            thenableFake
+                .then(() => { throw new Error(errorMessage); })
+                .then(thenStub)
+                .catch(() => null)
+                .resolve();
+
+            assert.equal(thenStub.callCount, 0);
+        });
+
+        it('throws an error when called if no catch actions exist', function () {
             function testAction() {
                 thenableFake
                     .then(() => null)
@@ -77,8 +89,6 @@ describe('ThenableFake', function () {
         });
 
         it('calls finally actions when resolutions are complete', function () {
-            const thenableFake = getThenableFake();
-
             const finallyStub = sinon.stub();
 
             thenableFake
@@ -92,8 +102,6 @@ describe('ThenableFake', function () {
         });
 
         it('calls finally actions when an error is thrown', function () {
-            const thenableFake = getThenableFake();
-
             const finallyStub = sinon.stub();
 
             thenableFake

@@ -93,20 +93,38 @@
             this.finallyActions.forEach((action) => action());
         },
 
-        then: function (action) {
-            this.thenActions.push(action);
+        throwOnUnacceptableAction: function (action) {
+            const actionType = typeof action;
+
+            if(actionType !== 'function' && actionType !== 'undefined') {
+                throw new Error(`Recieved unexpected value for then, catch or finally. Expected undefined or function, but got value of type ${actionType}`);
+            }
+        },
+
+        pushActionIfSafe: function(actions, newAction) {
+            if(typeof newAction === 'function') {
+                actions.push(newAction);
+            }
+        },
+
+        then: function (action, rejection) {
+            this.throwOnUnacceptableAction(action);
+            this.pushActionIfSafe(this.thenActions, action);
+            this.catch(rejection);
 
             return this;
         },
 
         catch: function (action) {
-            this.catchActions.push(action);
-
+            this.throwOnUnacceptableAction(action);
+            this.pushActionIfSafe(this.catchActions, action);
+            
             return this;
         },
 
         finally: function (action) {
-            this.finallyActions.push(action);
+            this.throwOnUnacceptableAction(action);
+            this.pushActionIfSafe(this.finallyActions, action);
 
             return this;
         }
