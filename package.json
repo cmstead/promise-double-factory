@@ -1,10 +1,11 @@
 {
   "name": "promise-fake-factory",
   "version": "1.0.0",
-  "description": "The drop-in fake for testing promise-consuming code",
+  "description": "The drop-in test double for ES-Next and Promise/A+ promises",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha ./tests/**/*.test.js"
+    "test": "node ./node_modules/mocha/bin/mocha ./tests/**/*.test.js",
+    "build-readme": "node ./node_modules/booklisp ./readme-src/readme.md ./README.md"
   },
   "keywords": [
     "promise",
@@ -16,6 +17,7 @@
   "author": "Chris Stead",
   "license": "MPL-2.0",
   "devDependencies": {
+    "booklisp": "^1.7.2",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "sinon": "^7.2.4"

@@ -84,7 +84,11 @@
         reject: function (error) {
             this.throwOnNoCatch();
 
-            this.catchActions.forEach((catchAction) => catchAction(error));
+            let nextResult = error;
+
+            this.catchActions.forEach(function (catchAction) {
+                nextResult = catchAction(nextResult);
+            });
 
             this.callFinallyActions();
         },
@@ -96,13 +100,13 @@
         throwOnUnacceptableAction: function (action) {
             const actionType = typeof action;
 
-            if(actionType !== 'function' && actionType !== 'undefined') {
+            if (actionType !== 'function' && actionType !== 'undefined') {
                 throw new Error(`Recieved unexpected value for then, catch or finally. Expected undefined or function, but got value of type ${actionType}`);
             }
         },
 
-        pushActionIfSafe: function(actions, newAction) {
-            if(typeof newAction === 'function') {
+        pushActionIfSafe: function (actions, newAction) {
+            if (typeof newAction === 'function') {
                 actions.push(newAction);
             }
         },
@@ -118,7 +122,7 @@
         catch: function (action) {
             this.throwOnUnacceptableAction(action);
             this.pushActionIfSafe(this.catchActions, action);
-            
+
             return this;
         },
 
@@ -152,7 +156,7 @@
         let resolveArgs = { args: null };
         let rejectArgs = { args: null };
 
-        function PromiseFake(callthrough) {
+        function PromiseFake(executor) {
             let internalCounts = {
                 resolve: 0,
                 reject: 0
@@ -161,8 +165,28 @@
             const resolve = getPromiseInternalFunction(internalCounts, resolveArgs, 'resolve');
             const reject = getPromiseInternalFunction(internalCounts, rejectArgs, 'reject');
 
-            callthrough(resolve, reject);
+            executor(resolve, reject);
+
+            const coreThenable = getThenableFake();
+
+            this.thenables = {
+                coreThenable: coreThenable
+            };
+
+            this.then = (...args) => coreThenable.then.apply(coreThenable, args);
+            this.catch = (...args) => coreThenable.catch.apply(coreThenable, args);
+            this.finally = (...args) => coreThenable.finally.apply(coreThenable, args);
         };
+
+        PromiseFake.all = function () {
+            PromiseFake.thenables.all = getThenableFake();
+            return PromiseFake.thenables.all;
+        }
+
+        PromiseFake.race = function () {
+            PromiseFake.thenables.race = getThenableFake();
+            return PromiseFake.thenables.race;
+        }
 
         PromiseFake.resolve = resolveArgs;
         PromiseFake.reject = rejectArgs;

@@ -25,11 +25,13 @@ describe('ThenableFake', function () {
 
         it('calls all then actions when called', function () {
             const thenStub = sinon.stub();
+            const thenStub1 = thenStub;
+            const thenStub2 = thenStub;
 
             thenableFake
                 .then(thenStub)
-                .then(thenStub)
-                .then(thenStub)
+                .then(thenStub1)
+                .then(thenStub2)
                 .catch(() => null)
                 .resolve();
 
