@@ -1,7 +1,7 @@
 {
   "name": "promise-fake-factory",
   "version": "1.0.0",
-  "description": "",
+  "description": "The drop-in fake for testing promise-consuming code",
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha ./tests/**/*.test.js"
