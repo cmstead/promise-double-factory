@@ -1,6 +1,6 @@
 {
   "name": "promise-double-factory",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The drop-in test double for ES-Next and Promise/A+ promises",
   "main": "index.js",
   "scripts": {
